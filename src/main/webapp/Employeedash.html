@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="ISO-8859-1">
+<title>Insert title here</title>
+</head>
+<body>
+		<button type="button" onclick="viewInfo()">View Your Information</button>
+		<div id="userinfo"></div>
+
+		<FORM ACTION="/BearServletDemo/CreateRequest" method="get">
+			<INPUT type="number" name="amount"/>
+			<INPUT type="submit" value="Submit Request"/>
+		</FORM>
+
+		<button type="button" onclick="loadRequests()">Load Your Requests</button>
+		<div id="requests"></div>
+		
+		<button type="button" onclick="loadPendingRequests()">Load Your Pending Requests</button>
+		<div id="pendingrequests"></div>
+		
+		<button type="button" onclick="loadResolvedRequests()">Load Your Resolved Requests</button>
+		<div id="resolvedrequests"></div>
+		
+		<A HREF="index.html">Log out</A>
+</body>
+<script>
+function loadRequests() {
+	let xhr = new XMLHttpRequest();
+	xhr.onreadystatechange = function() {
+		if(this.readyState == 4) {
+			if (this.status == 200) {
+				document.getElementById("requests").innerHTML = xhr.responseText;
+			} else {
+				console.log("error");
+			}
+		}
+	}
+	xhr.open('POST', '/BearServletDemo/RequestController');
+	xhr.send();
+}
+
+function loadPendingRequests() {
+	let xhr = new XMLHttpRequest();
+	xhr.onreadystatechange = function() {
+		if(this.readyState == 4) {
+			if (this.status == 200) {
+				document.getElementById("pendingrequests").innerHTML = xhr.responseText;
+			} else {
+				console.log("error");
+			}
+		}
+	}
+	xhr.open('GET', '/BearServletDemo/YourRequestController');
+	xhr.send();
+}
+
+function loadResolvedRequests() {
+	let xhr = new XMLHttpRequest();
+	xhr.onreadystatechange = function() {
+		if(this.readyState == 4) {
+			if (this.status == 200) {
+				document.getElementById("resolvedrequests").innerHTML = xhr.responseText;
+			} else {
+				console.log("error");
+			}
+		}
+	}
+	xhr.open('POST', '/BearServletDemo/YourRequestController');
+	xhr.send();
+}
+
+function viewInfo() {
+	let xhr = new XMLHttpRequest();
+	xhr.onreadystatechange = function() {
+		if(this.readyState == 4) {
+			if (this.status == 200) {
+				document.getElementById("userinfo").innerHTML = xhr.responseText;
+			} else {
+				console.log("error");
+			}
+		}
+	}
+	xhr.open('POST', '/BearServletDemo/viewEmployee');
+	xhr.send();
+}
+</script>
+</html>

@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="ISO-8859-1">
+<title>Insert title here</title>
+</head>
+<body>
+		<button type="button" onclick="loadRequests()">View All Requests</button>
+		<div id="requests"></div>
+		
+		<button type="button" onclick="loadPendingRequests()">View Pending Requests</button>
+		<div id="pending"></div>
+		
+		<button type="button" onclick="loadResolvedRequests()">View Resolved Requests</button>
+		<div id="resolved"></div>
+		
+		<FORM ACTION="/BearServletDemo/FilterController" method="get">
+			<INPUT type="text" name="filterid" value="Employee ID"/>
+			<INPUT type="submit" value="Filter By Employee"/>
+		</FORM>
+		
+		<button type="button" onclick="loadFilteredRequests()">View Filtered Requests</button>
+		<div id="filteredresolved"></div>
+		
+		<button type="button" onclick="loadEmployees()">View Employees</button>
+		<div id="employees"></div>
+		
+		<FORM ACTION="/BearServletDemo/CreateRequest" method="post">
+			<INPUT type="text" name="id" value="request ID"/>
+			<INPUT type="text" name="resolve" value="1 to approve, 2 to deny"/>
+			<INPUT type="submit" value="Approve/Deny"/>
+		</FORM>
+		
+		<A HREF="index.html">Log out</A>
+</body>
+<script>
+function loadEmployees() {
+	let xhr = new XMLHttpRequest();
+	xhr.onreadystatechange = function() {
+		if(this.readyState == 4) {
+			if (this.status == 200) {
+				document.getElementById("employees").innerHTML = xhr.responseText;
+			} else {
+				console.log("error");
+			}
+		}
+	}
+	xhr.open('GET', '/BearServletDemo/EmployeeController');
+	xhr.send();
+}
+
+function loadRequests() {
+	let xhr = new XMLHttpRequest();
+	xhr.onreadystatechange = function() {
+		if(this.readyState == 4) {
+			if (this.status == 200) {
+				document.getElementById("requests").innerHTML = xhr.responseText;
+			} else {
+				console.log("error");
+			}
+		}
+	}
+	xhr.open('GET', '/BearServletDemo/RequestController');
+	xhr.send();
+}
+
+function loadPendingRequests() {
+	let xhr = new XMLHttpRequest();
+	xhr.onreadystatechange = function() {
+		if(this.readyState == 4) {
+			if (this.status == 200) {
+				document.getElementById("pending").innerHTML = xhr.responseText;
+			} else {
+				console.log("error");
+			}
+		}
+	}
+	xhr.open('GET', '/BearServletDemo/RequestControllerPending');
+	xhr.send();
+}
+
+function loadResolvedRequests() {
+	let xhr = new XMLHttpRequest();
+	xhr.onreadystatechange = function() {
+		if(this.readyState == 4) {
+			if (this.status == 200) {
+				document.getElementById("resolved").innerHTML = xhr.responseText;
+			} else {
+				console.log("error");
+			}
+		}
+	}
+	xhr.open('POST', '/BearServletDemo/RequestControllerPending');
+	xhr.send();
+}
+
+function loadFilteredRequests() {
+	let xhr = new XMLHttpRequest();
+	xhr.onreadystatechange = function() {
+		if(this.readyState == 4) {
+			if (this.status == 200) {
+				document.getElementById("filteredresolved").innerHTML = xhr.responseText;
+			} else {
+				console.log("error");
+			}
+		}
+	}
+	xhr.open('POST', '/BearServletDemo/FilterController');
+	xhr.send();
+}
+</script>
+</html>

@@ -1,0 +1,125 @@
+/* PL/SQL */
+/*DROP TABLE REQUEST;
+DROP TABLE DEPARTMENT;
+DROP TABLE EMPLOYEE;*/
+
+CREATE TABLE REQUEST (
+    Request_Id INTEGER PRIMARY KEY,
+    Employee_Id INTEGER,
+    Request_Amount INTEGER CHECK (Request_Amount > 0),
+    Resolved INTEGER DEFAULT 0,
+    Manager_Id INTEGER
+);
+
+CREATE TABLE DEPARTMENT (
+    Department_Id INTEGER PRIMARY KEY,
+    Department_Name VARCHAR2(50)
+);
+
+CREATE TABLE EMPLOYEE (
+    Employee_Id INTEGER PRIMARY KEY,
+    Employee_Name VARCHAR2(50),
+    Employee_Email VARCHAR2(50) UNIQUE,
+    Employee_Password VARCHAR2(50),
+    Department_Id INTEGER
+);
+
+
+
+
+
+-- Create foreign keys
+ALTER TABLE Employee ADD CONSTRAINT FK_Employee_Department
+FOREIGN KEY (Department_Id)
+REFERENCES DEPARTMENT (Department_Id)
+ON DELETE CASCADE;
+
+ALTER TABLE Request ADD CONSTRAINT FK_Employee_Requester
+FOREIGN KEY (Employee_Id)
+REFERENCES Employee (Employee_Id)
+ON DELETE CASCADE;
+
+ALTER TABLE Request ADD CONSTRAINT FK_Manager_Resolver
+FOREIGN KEY (Manager_Id)
+REFERENCES Employee (Employee_Id)
+ON DELETE CASCADE;
+
+-- Sequence
+CREATE SEQUENCE SQ_EMPLOYEE_PK START WITH 1 INCREMENT BY 1;
+CREATE SEQUENCE SQ_DEPARTMENT_PK START WITH 1 INCREMENT BY 1;
+CREATE SEQUENCE SQ_REQUEST_PK START WITH 1 INCREMENT BY 1;
+
+-- Populate
+INSERT INTO DEPARTMENT (Department_Name)
+VALUES ('Plebeians');
+INSERT INTO DEPARTMENT (Department_Name)
+VALUES ('Overlords');
+
+INSERT INTO EMPLOYEE (Employee_Name, Employee_Email, Employee_Password, Department_Id)
+VALUES ('Jimbob', 'jimbob@jimmail.com', 'terriblepassword', 1);
+
+INSERT INTO EMPLOYEE (Employee_Name, Employee_Email, Employee_Password, Department_Id)
+VALUES ('Jimjoe', 'jimjoe@jimmail.com', 'terriblepassword2', 2);
+
+INSERT INTO REQUEST (Employee_Id, Request_Amount, Resolved, Manager_Id)
+VALUES (1, 10000, 2, 2);
+
+INSERT INTO REQUEST (Employee_Id, Request_Amount, Resolved, Manager_Id) VALUES (1, 15000, 2, 2);
+
+INSERT INTO REQUEST (Employee_Id, Request_Amount, Resolved, Manager_Id) VALUES (2, 15000, 1, 2);
+
+
+-- Trigger (before insert, use sequence)
+CREATE OR REPLACE TRIGGER TR_INSERT_DEPARTMENT
+BEFORE INSERT ON DEPARTMENT
+FOR EACH ROW
+BEGIN
+    SELECT SQ_DEPARTMENT_PK.NEXTVAL INTO :NEW.Department_Id FROM DUAL;
+END;
+/
+
+CREATE OR REPLACE TRIGGER TR_INSERT_EMPLOYEE
+BEFORE INSERT ON EMPLOYEE
+FOR EACH ROW
+BEGIN
+    SELECT SQ_EMPLOYEE_PK.NEXTVAL INTO :NEW.Employee_Id FROM DUAL;
+END;
+/
+
+CREATE OR REPLACE TRIGGER TR_INSERT_REQUEST
+BEFORE INSERT ON REQUEST
+FOR EACH ROW
+BEGIN
+    SELECT SQ_REQUEST_PK.NEXTVAL INTO :NEW.Request_Id FROM DUAL;
+END;
+/
+
+
+-- Stored Procedures
+CREATE OR REPLACE PROCEDURE SP_CREATE_REQUEST
+(E_ID IN NUMBER, R_AMT IN NUMBER, RES IN NUMBER, MNG IN NUMBER) AS
+BEGIN
+    --SAVEPOINT;
+    
+    INSERT INTO REQUEST (Employee_Id, Request_Amount, Resolved, Manager_Id) VALUES (E_ID, R_AMT, RES, MNG);
+    
+    --ROLLBACK    
+    COMMIT;
+END;
+/
+
+CREATE OR REPLACE PROCEDURE SP_UPDATE_REQUEST
+(R_ID IN NUMBER, RES IN NUMBER, MNG IN NUMBER) AS
+BEGIN
+    --SAVEPOINT;
+    
+    UPDATE REQUEST SET Resolved = RES
+        WHERE Request_Id = r_id;
+        
+    UPDATE REQUEST SET Manager_Id = RES
+        WHERE Request_Id = r_id;
+    
+    --ROLLBACK    
+    COMMIT;
+END;
+/
